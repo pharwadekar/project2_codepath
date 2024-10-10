@@ -1,4 +1,4 @@
-# project2_codepath
+# project 2 and 3 _codepath
 Simple Flashcard App with ReactJS
 
 ## Features
