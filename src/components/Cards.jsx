@@ -19,7 +19,10 @@ const Cards = () => {
     const [userGuess, setUserGuess] = useState('');
     const [feedback, setFeedback] = useState('');
     const [streak, setStreak] = useState(0);
+    const [longestStreak, setLongestStreak] = useState(0);
+    const [correctCount, setCorrectCount] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
+    const [masteredCards, setMasteredCards] = useState([]);
 
     const handleNext = () => {
         setIsFlipped(false);
@@ -46,7 +49,14 @@ const Cards = () => {
     const handleGuessSubmit = () => {
         if (userGuess.trim().toLowerCase() === flashcards[currentIndex].answer.toLowerCase()) {
             setFeedback('Correct!');
-            setStreak((prevStreak) => prevStreak + 1);
+            setStreak((prevStreak) => {
+                const newStreak = prevStreak + 1;
+                if (newStreak > longestStreak) {
+                    setLongestStreak(newStreak);
+                }
+                return newStreak;
+            });
+            setCorrectCount((prevCount) => prevCount + 1);
         } else {
             setFeedback('Incorrect, try again.');
             setStreak(0);
@@ -62,16 +72,22 @@ const Cards = () => {
         setFeedback('');
     };
 
+    const handleMarkAsMastered = () => {
+        setMasteredCards((prevMastered) => [...prevMastered, flashcards[currentIndex]]);
+    };
+
     return (
         <div className='card-container'>
             <h3 style={{ color: 'black' }}>Streak: {streak}</h3>
+            <h3 style={{ color: 'black' }}>Longest Streak: {longestStreak}</h3>
+            <h3 style={{ color: 'black' }}>Correct Guesses: {correctCount}</h3>
             <div className={`flip-card ${isFlipped ? 'flipped' : ''}`} onClick={handleFlip}>
                 <div className='flip-card-inner'>
                     <div className='flip-card-front'>
-                        <h2>{flashcards[currentIndex].question}</h2>
+                        <h2 style={{ color: 'black' }}>{flashcards[currentIndex].question}</h2>
                     </div>
                     <div className='flip-card-back'>
-                        <p>{flashcards[currentIndex].answer}</p>
+                        <p style={{ color: 'black' }}>{flashcards[currentIndex].answer}</p>
                     </div>
                 </div>
             </div>
@@ -79,6 +95,7 @@ const Cards = () => {
                 <button onClick={handlePrev}>Back</button>
                 <button onClick={handleNext}>Next</button>
                 <button onClick={shuffleFlashcards}>Shuffle</button>
+                <button onClick={handleMarkAsMastered}>Mark as Mastered</button>
             </div>
             <div className='guess-container'>
                 <input 
@@ -90,8 +107,17 @@ const Cards = () => {
                 <button onClick={handleGuessSubmit}>Submit Guess</button>
                 <p style={{ color: feedback === 'Correct!' ? 'green' : 'red' }}>{feedback}</p>
             </div>
+            <div className='mastered-cards'>
+                <h3 style={{ color: 'black' }}>Mastered Cards:</h3>
+                <ul>
+                    {masteredCards.map((card, index) => (
+                        <li onClick = {handleNext} key={index} style={{ color: 'black' }}>{card.question}</li>
+                    ))}
+                </ul>
+            </div>
         </div>
     );
+    
 };
 
 export default Cards;
